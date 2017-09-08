@@ -1107,7 +1107,7 @@ void receivedNrpn(int parameter, int value) {
       break;
     // Global Custom Row Offset Instead Of Octave
     case 253:
-      if (inRange(value, -17, 16)) {
+      if (inRange(value, -17, 30)) {
         Global.customRowOffset = value;
       }
       break;
@@ -1275,6 +1275,64 @@ short getNoteNumColumn(byte split, byte notenum, byte row) {
 
   short col = notenum - (lowest + (row * offset) + Split[split].transposeOctave) + 1   // calculate the column that this MIDI note can be played on
             + Split[split].transposeLights - Split[split].transposePitch;;             // adapt for transposition settings
+
+  if (Global.rowOffset == ROWOFFSET_OCTAVECUSTOM && Global.customRowOffset > 16) {
+    short o = Global.customRowOffset;
+    byte r = row;
+    byte noteCol = col;
+    
+    if (o == 17 || o == 20 || o == 22 || o == 23) {
+      r = floor(row/4);
+    }
+    else if (o == 18) {
+      r = floor(row/3);
+    }
+    else if (o == 19 || o == 21 || o == 25 || o == 26) {
+      r = floor(row/2);
+    }
+    
+    if (o >= 17 && o <= 19) {
+      col = notenum - (lowest + r * offset + Split[split].transposeOctave)
+          + Split[split].transposeLights - Split[split].transposePitch;;
+    }
+        
+    if (o >= 20 && o <= 23) {
+      //0,1,2,3,4,5,6
+      //0,1,2,2,3,4,5
+      byte scale[7] = {0,2,4,5,7,9,11};
+      noteCol += lowest + r * offset - Split[split].transposeLights;
+      notenum = floor(noteCol/7) * 12 + scale[noteCol%7];
+      if (row == 3 || row == 7) {
+        if (o == 22) {
+          notenum += 1;
+        }
+        else if (o == 23) {
+          notenum -= 1;
+        }
+      }
+    }
+
+    if (o == 24 || o == 25) {
+      notenum = lowest + r * offset + noteCol*2;
+    }
+
+    if (o == 26) {
+      notenum = lowest + r * offset + noteCol*2;
+      if (row%2 == 1) {
+        notenum += 1;
+      }
+    }
+
+    if (o == 27) {
+      byte scale[19] = {0,2,4,5,7,9,11,13,15,17,19,21,23,24,26,28,30,32,34};
+      noteCol += lowest + r * offset - Split[split].transposeLights;
+      notenum = floor(noteCol/19) * 36 + scale[noteCol%19] - r * 24;//
+    }
+
+    col += 1;
+
+  }
+
   if (isLeftHandedSplit(split)) {
     col = NUMCOLS - col;
   }

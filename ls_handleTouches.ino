@@ -1913,10 +1913,65 @@ byte getNoteNumber(byte split, byte col, byte row) {
   if (isLeftHandedSplit(split)) {
     noteCol = (NUMCOLS - col);
   }
+  
+  noteCol -= 1;
 
-  notenum = lowest + (row * offset) + noteCol - 1;
+  notenum = lowest + (row * offset) + noteCol - Split[split].transposeLights;
 
-  return notenum - Split[split].transposeLights;
+  if (Global.rowOffset == ROWOFFSET_OCTAVECUSTOM && Global.customRowOffset > 16) {
+    short o = Global.customRowOffset;
+    byte r = row;
+    
+    if (o == 17 || o == 20 || o == 22 || o == 23) {
+      r = floor(row/4);
+    }
+    else if (o == 18) {
+      r = floor(row/3);
+    }
+    else if (o == 19 || o == 21 || o == 25 || o == 26) {
+      r = floor(row/2);
+    }
+    
+    if (o >= 17 && o <= 19) {
+      notenum = lowest + r * offset + noteCol;
+    }
+        
+    if (o >= 20 && o <= 23) {
+      //0,1,2,3,4,5,6
+      //0,1,2,2,3,4,5
+      byte scale[7] = {0,2,4,5,7,9,11};
+      noteCol += lowest + r * offset - Split[split].transposeLights;
+      notenum = floor(noteCol/7) * 12 + scale[noteCol%7];
+      if (row == 3 || row == 7) {
+        if (o == 22) {
+          notenum += 1;
+        }
+        else if (o == 23) {
+          notenum -= 1;
+        }
+      }
+    }
+
+    if (o == 24 || o == 25) {
+      notenum = lowest + r * offset + noteCol*2;
+    }
+
+    if (o == 26) {
+      notenum = lowest + r * offset + noteCol*2;
+      if (row%2 == 1) {
+        notenum += 1;
+      }
+    }
+
+    if (o == 27) {
+      byte scale[19] = {0,2,4,5,7,9,11,13,15,17,19,21,23,24,26,28,30,32,34};
+      noteCol += lowest + r * offset - Split[split].transposeLights;
+      notenum = floor(noteCol/19) * 36 + scale[noteCol%19] - r * 24;//
+    }
+
+  }
+
+  return notenum;
 }
 
 void determineNoteOffsetAndLowest(byte split, byte row, short& offset, short& lowest) {
@@ -1940,6 +1995,40 @@ void determineNoteOffsetAndLowest(byte split, byte row, short& offset, short& lo
       if (Global.splitActive && split == RIGHT) {     // if the right split is displayed, change the column so that it the lower left starting
         getSplitBoundaries(LEFT, lowCol, highCol);    // point starts at the same point as the left split, behaving as if there were two independent
         lowest = lowest - (highCol - lowCol);         // LinnStruments next to each-other
+      }
+    }
+    else if (offset > 16) {
+      if (offset == 17) {//2ROWS
+        offset = 6;
+        lowest = 12 * 5;
+      }
+      if (offset == 18) {//3ROWS
+        offset = 6;
+        lowest = 12 * 4;
+      }
+      if (offset == 19) {//4ROWS
+        offset = 6;
+        lowest = 12 * 3 + 6;
+      }
+      if (offset >= 20 && offset <= 23) {//PIANO
+        offset = 7;
+        lowest = 7 * 4;
+      }
+      if (offset == 24) {//HARPEJJI
+        offset = 1;
+        lowest = 12 * 3;
+      }
+      if (offset == 25) {//HARPEJJI
+        offset = 1;
+        lowest = 12 * 4;
+      }
+      if (offset == 26) {//HARPEJJI
+        offset = 12;
+        lowest = 12 * 3;
+      }
+      if (offset == 27) {//HARPEJJI
+        offset = 13;
+        lowest = 19 * 1;
       }
     }
     else if (offset == -17) {                         // if custom row offset is set to inverted guitar tuning...

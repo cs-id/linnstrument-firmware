@@ -1186,6 +1186,39 @@ void paintRowOffset() {
   if (Global.customRowOffset == -17) {
     condfont_draw_string(0, 0, "-GUI", globalColor, false);
   }
+  else if (Global.customRowOffset == 17) {
+    condfont_draw_string(0, 0, "2ROWS", globalColor, false);
+  }
+  else if (Global.customRowOffset == 18) {
+    condfont_draw_string(0, 0, "3ROWS", globalColor, false);
+  }
+  else if (Global.customRowOffset == 19) {
+    condfont_draw_string(0, 0, "4ROWS", globalColor, false);
+  }
+  else if (Global.customRowOffset == 20) {
+    condfont_draw_string(0, 0, "PIANO2", globalColor, false);
+  }
+  else if (Global.customRowOffset == 21) {
+    condfont_draw_string(0, 0, "PIANO4", globalColor, false);
+  }
+  else if (Global.customRowOffset == 22) {
+    condfont_draw_string(0, 0, "PIA+1", globalColor, false);
+  }
+  else if (Global.customRowOffset == 23) {
+    condfont_draw_string(0, 0, "PIA-1", globalColor, false);
+  }
+  else if (Global.customRowOffset == 24) {
+    condfont_draw_string(0, 0, "HARPEJJI", globalColor, false);
+  }
+  else if (Global.customRowOffset == 25) {
+    condfont_draw_string(0, 0, "HARP2", globalColor, false);
+  }
+  else if (Global.customRowOffset == 26) {
+    condfont_draw_string(0, 0, "HARP0", globalColor, false);
+  }
+  else if (Global.customRowOffset == 27) {
+    condfont_draw_string(0, 0, "HARPX", globalColor, false);
+  }
   else {
     paintNumericDataDisplay(globalColor, Global.customRowOffset, 0, false);
   }

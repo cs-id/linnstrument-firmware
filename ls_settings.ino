@@ -376,8 +376,6 @@ void initializeNoteLights(GlobalSettings& g) {
     g.mainNotes[3] |= 1 << 0;
     g.mainNotes[3] |= 1 << 2;
     g.mainNotes[3] |= 1 << 4;
-    g.mainNotes[3] |= 1 << 7;
-    g.mainNotes[3] |= 1 << 9;
 
     // Minor Pentatonic
     g.mainNotes[4] |= 1 << 0;
@@ -466,8 +464,8 @@ void initializePresetSettings() {
 
     g.currentPerSplit = LEFT;
 
-    g.rowOffset = 5;
-    g.customRowOffset = 12;
+    g.rowOffset = 6;
+    g.customRowOffset = 19;
     g.velocitySensitivity = velocityMedium;
     g.minForVelocity = DEFAULT_MIN_VELOCITY;
     g.maxForVelocity = DEFAULT_MAX_VELOCITY;
@@ -512,10 +510,10 @@ void initializePresetSettings() {
           focusCell[s][chan].col = 0;
           focusCell[s][chan].row = 0;
         }
-        p.split[s].midiMode = oneChannel;
+        p.split[s].midiMode = channelPerNote;
         p.split[s].midiChanPerRowReversed = false;
-        p.split[s].bendRangeOption = bendRange2;
-        p.split[s].customBendRange = 24;
+        p.split[s].bendRangeOption = bendRange24;
+        p.split[s].customBendRange = 48;
         p.split[s].sendX = true;
         p.split[s].sendY = true;
         p.split[s].sendZ = true;
@@ -526,7 +524,7 @@ void initializePresetSettings() {
         p.split[s].minForY = 0;
         p.split[s].maxForY = 127;
         p.split[s].customCCForY = 74;
-        p.split[s].relativeY = false;
+        p.split[s].relativeY = true;
         p.split[s].initialRelativeY = 64;
         p.split[s].expressionForZ = loudnessPolyPressure;
         p.split[s].minForZ = 0;
@@ -534,8 +532,6 @@ void initializePresetSettings() {
         p.split[s].customCCForZ = 11;
         p.split[s].ccForZ14Bit = false;
         memcpy(&p.split[s].ccForFader, ccFaderDefaults, sizeof(unsigned short)*8);
-        p.split[s].colorAccent = COLOR_CYAN;
-        p.split[s].colorLowRow = COLOR_YELLOW;
         p.split[s].colorSequencerEmpty = COLOR_YELLOW;
         p.split[s].colorSequencerEvent = COLOR_ORANGE;
         p.split[s].colorSequencerDisabled = COLOR_LIME;
@@ -567,8 +563,10 @@ void initializePresetSettings() {
       p.split[LEFT].midiChanSet[chan] = false;
     }
     p.split[LEFT].midiChanPerRow = 1;
-    p.split[LEFT].colorMain = COLOR_GREEN;
-    p.split[LEFT].colorPlayed = COLOR_RED;
+    p.split[LEFT].colorMain = COLOR_YELLOW;//COLOR_GREEN;
+    p.split[LEFT].colorAccent = COLOR_RED;//COLOR_CYAN;
+    p.split[LEFT].colorPlayed = COLOR_CYAN;//COLOR_RED;
+    p.split[LEFT].colorLowRow = COLOR_GREEN;//COLOR_YELLOW;
     p.split[LEFT].lowRowMode = lowRowNormal;
     p.split[LEFT].sequencerView = sequencerScales;
 
@@ -581,8 +579,10 @@ void initializePresetSettings() {
     }
     p.split[RIGHT].midiChanSet[15] = false;
     p.split[RIGHT].midiChanPerRow = 9;
-    p.split[RIGHT].colorMain = COLOR_BLUE;
-    p.split[RIGHT].colorPlayed = COLOR_MAGENTA;
+    p.split[RIGHT].colorMain = COLOR_GREEN;//COLOR_BLUE;
+    p.split[RIGHT].colorAccent = COLOR_CYAN;//COLOR_CYAN;
+    p.split[RIGHT].colorPlayed = COLOR_RED;//COLOR_MAGENTA;
+    p.split[RIGHT].colorLowRow = COLOR_YELLOW;//COLOR_YELLOW;
     p.split[RIGHT].lowRowMode = lowRowNormal;
     p.split[RIGHT].sequencerView = sequencerScales;
   }
@@ -1035,7 +1035,7 @@ boolean activateMpeChannels(byte split, byte mainChannel, byte polyphony) {
 
 void configureStandardMpeExpression(byte split) {
   Split[split].bendRangeOption = bendRange24;
-  Split[split].customBendRange = 24;
+  Split[split].customBendRange = 48;
   Split[split].expressionForY = timbreCC74;
   Split[split].customCCForY = 74;
   Split[split].expressionForZ = loudnessChannelPressure;
@@ -2010,7 +2010,7 @@ void handleSplitHandednessRelease() {
 }
 
 void handleRowOffsetNewTouch() {
-  handleNumericDataNewTouchCol(Global.customRowOffset, -17, 16, true);
+  handleNumericDataNewTouchCol(Global.customRowOffset, -17, 30, true);
 }
 
 void handleRowOffsetRelease() {
